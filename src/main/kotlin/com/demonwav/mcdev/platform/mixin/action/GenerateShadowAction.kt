@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.mixin.action
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findFields
 import com.demonwav.mcdev.platform.mixin.util.findMethods
-import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findFirstMember
 import com.demonwav.mcdev.util.findLastChild
@@ -53,16 +52,11 @@ class GenerateShadowAction : MixinCodeInsightAction() {
     override fun invoke(project: Project, editor: Editor, file: PsiFile) {
         val offset = editor.caretModel.offset
         val psiClass = file.findElementAt(offset)?.findContainingClass() ?: return
-        val targets = psiClass.mixinTargets
 
-        val fields = (findFields(psiClass, targets) ?: Stream.empty())
-                .map(::PsiFieldMember)
-
-        val methods = (findMethods(psiClass, targets) ?: Stream.empty())
-                .map(::PsiMethodMember)
+        val fields = findFields(psiClass)?.map(::PsiFieldMember) ?: Stream.empty()
+        val methods = findMethods(psiClass)?.map(::PsiMethodMember) ?: Stream.empty()
 
         val members = Stream.concat(fields, methods).toTypedArray()
-
         if (members.isEmpty()) {
             HintManager.getInstance().showErrorHint(editor, "No members to shadow have been found")
             return

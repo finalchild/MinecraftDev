@@ -28,6 +28,8 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiType
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.filters.ElementFilter
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import org.jetbrains.annotations.Contract
@@ -119,7 +121,7 @@ inline fun PsiElement.findLastChild(condition: (PsiElement) -> Boolean): PsiElem
 @Contract(pure = true)
 fun <T : Any> Stream<T>.filter(filter: ElementFilter?, context: PsiElement): Stream<T> {
     filter ?: return this
-    return filter { filter.isClassAcceptable(it::class.java) && filter.isAcceptable(it, context) }
+    return filter { filter.isAcceptable(it, context) }
 }
 
 @Contract(pure = true)
@@ -152,4 +154,9 @@ infix fun PsiElement.equivalentTo(other: PsiElement): Boolean {
 fun PsiType?.isErasureEquivalentTo(other: PsiType?): Boolean {
     // TODO: Do more checks for generics instead
     return TypeConversionUtil.erasure(this) == TypeConversionUtil.erasure(other)
+}
+
+@Contract(pure = true)
+inline fun <T> PsiElement.cached(crossinline compute: () -> T): T {
+    return CachedValuesManager.getCachedValue(this) { CachedValueProvider.Result.create(compute(), this) }
 }
