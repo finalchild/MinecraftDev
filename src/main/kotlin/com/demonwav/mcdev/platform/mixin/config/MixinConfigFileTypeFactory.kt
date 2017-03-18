@@ -21,5 +21,5 @@ class MixinConfigFileTypeFactory : FileTypeFactory(), FileNameMatcher {
     }
 
     override fun getPresentableString() = "Mixin Configuration"
-    override fun accept(fileName: String) = fileName.endsWith(".json") && fileName.startsWith("mixins.")
+    override fun accept(fileName: String) = fileName.startsWith("mixins.") && fileName.endsWith(".json")
 }

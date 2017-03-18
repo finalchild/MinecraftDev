@@ -22,6 +22,7 @@ object MixinConstants {
         const val INJECTION_POINT = "org.spongepowered.asm.mixin.injection.InjectionPoint"
         const val MIXIN_AGENT = "org.spongepowered.tools.agent.MixinAgent"
         const val MIXIN_CONFIG = "org.spongepowered.asm.mixin.transformer.MixinConfig"
+        const val MIXIN_PLUGIN = "org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin"
 
         const val SERIALIZED_NAME = "com.google.gson.annotations.SerializedName"
     }
