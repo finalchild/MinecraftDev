@@ -13,7 +13,7 @@ package com.demonwav.mcdev.platform.mixin.reference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT_CODE
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.INJECTION_POINT
-import com.demonwav.mcdev.util.ReferenceResolver
+import com.demonwav.mcdev.util.JavaReferenceResolver
 import com.demonwav.mcdev.util.completeToLiteral
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -23,7 +23,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import com.intellij.psi.search.searches.ClassInheritorsSearch
 
-object InjectionPointType : ReferenceResolver(), MixinReference {
+object InjectionPointType : JavaReferenceResolver(), MixinReference {
 
     override val description: String
         get() = "injection point type '%s'"
@@ -34,11 +34,11 @@ object InjectionPointType : ReferenceResolver(), MixinReference {
         // Remove selectors from the injection point type for now
         // TODO: Remove this when we have full support for @Slices
         val value = context.constantStringValue?.substringBefore(':') ?: return null
-        findTypes(context, { code, psiClass ->
+        findTypes(context) { code, psiClass ->
             if (value == code) {
                 return psiClass
             }
-        })
+        }
         return null
     }
 
@@ -48,9 +48,9 @@ object InjectionPointType : ReferenceResolver(), MixinReference {
 
     override fun collectVariants(context: PsiElement): Array<Any> {
         val list = ArrayList<LookupElementBuilder>()
-        findTypes(context, { code, _ ->
+        findTypes(context) { code, _ ->
             list.add(LookupElementBuilder.create(code).completeToLiteral(context))
-        })
+        }
         return list.toArray()
     }
 

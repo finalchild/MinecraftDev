@@ -14,7 +14,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.METHOD_
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.PolyReferenceResolver
+import com.demonwav.mcdev.util.PolyJavaReferenceResolver
 import com.demonwav.mcdev.util.completeToLiteral
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findContainingClass
@@ -34,7 +34,7 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 import kotlin.streams.toList
 
-object MethodReference : PolyReferenceResolver(), MixinReference {
+object MethodReference : PolyJavaReferenceResolver(), MixinReference {
 
     override val description: String
         get() = "method '%s' in target class"

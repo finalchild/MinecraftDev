@@ -15,7 +15,7 @@ import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.MixinMemberReference
 import com.demonwav.mcdev.platform.mixin.util.findSource
-import com.demonwav.mcdev.util.PolyReferenceResolver
+import com.demonwav.mcdev.util.PolyJavaReferenceResolver
 import com.demonwav.mcdev.util.annotationFromArrayValue
 import com.demonwav.mcdev.util.annotationFromValue
 import com.demonwav.mcdev.util.completeToLiteral
@@ -43,7 +43,7 @@ import com.intellij.psi.PsiThisExpression
 import com.intellij.psi.ResolveResult
 import com.intellij.util.ArrayUtil
 
-object TargetReference : PolyReferenceResolver(), MixinReference {
+object TargetReference : PolyJavaReferenceResolver(), MixinReference {
 
     override val description: String
         get() = "target reference '%s'"

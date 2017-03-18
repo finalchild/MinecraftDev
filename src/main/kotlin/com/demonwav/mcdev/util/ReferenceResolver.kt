@@ -36,15 +36,19 @@ abstract class ReferenceResolver : PsiReferenceProvider() {
     protected abstract fun resolveReference(context: PsiElement): PsiElement?
     protected abstract fun collectVariants(context: PsiElement): Array<Any>
 
-    fun createReference(element: PsiLiteral): PsiReference = Reference(element, this)
-    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext) = arrayOf(createReference(element as PsiLiteral))
+    fun createReference(element: PsiElement): PsiReference = Reference(element, this)
+    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext) = arrayOf(createReference(element))
 
-    private class Reference(element: PsiLiteral, private val resolver: ReferenceResolver) : PsiReferenceBase<PsiLiteral>(element) {
+    protected open fun findContextElement(element: PsiElement) = element
 
-        override fun resolve() = resolver.resolveReference(element.findContextElement())
-        override fun getVariants() = resolver.collectVariants(element.findContextElement())
-
+    private class Reference(element: PsiElement, private val resolver: ReferenceResolver) : PsiReferenceBase<PsiElement>(element) {
+        override fun resolve() = resolver.resolveReference(resolver.findContextElement(element))
+        override fun getVariants() = resolver.collectVariants(resolver.findContextElement(element))
     }
+}
+
+abstract class JavaReferenceResolver : ReferenceResolver() {
+    override fun findContextElement(element: PsiElement) = element.findJavaContextElement()
 }
 
 /**
@@ -56,18 +60,24 @@ abstract class PolyReferenceResolver : PsiReferenceProvider() {
     protected abstract fun resolveReference(context: PsiElement): Array<ResolveResult>
     protected abstract fun collectVariants(context: PsiElement): Array<Any>
 
-    fun createReference(element: PsiLiteral): PsiReference = Reference(element, this)
-    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext) = arrayOf(createReference(element as PsiLiteral))
+    fun createReference(element: PsiElement): PsiReference = Reference(element, this)
+    override fun getReferencesByElement(element: PsiElement, context: ProcessingContext) = arrayOf(createReference(element))
 
-    private class Reference(element: PsiLiteral, private val resolver: PolyReferenceResolver) : PsiReferenceBase.Poly<PsiLiteral>(element) {
+    protected open fun findContextElement(element: PsiElement) = element
 
-        override fun multiResolve(incompleteCode: Boolean) = resolver.resolveReference(element.findContextElement())
-        override fun getVariants() = resolver.collectVariants(element.findContextElement())
+    private class Reference(element: PsiElement, private val resolver: PolyReferenceResolver) : PsiReferenceBase.Poly<PsiElement>(element) {
+
+        override fun multiResolve(incompleteCode: Boolean) = resolver.resolveReference(resolver.findContextElement(element))
+        override fun getVariants() = resolver.collectVariants(resolver.findContextElement(element))
 
     }
 }
 
-private fun PsiElement.findContextElement(): PsiElement {
+abstract class PolyJavaReferenceResolver : PolyReferenceResolver() {
+    override fun findContextElement(element: PsiElement) = element.findJavaContextElement()
+}
+
+private fun PsiElement.findJavaContextElement(): PsiElement {
     var current: PsiElement
     var parent = this
 
@@ -108,7 +118,7 @@ private class ReplaceElementWithLiteral(private val editor: Editor, private val 
         // Run command to replace PsiElement
         CommandProcessor.getInstance().runUndoTransparentAction {
             runWriteAction {
-                val element = file.findElementAt(editor.caretModel.offset)!!.findContextElement()
+                val element = file.findElementAt(editor.caretModel.offset)!!.findJavaContextElement()
                 element.replace(JavaPsiFacade.getElementFactory(element.project).createExpressionFromText("\"$text\"", element.parent))
             }
         }
